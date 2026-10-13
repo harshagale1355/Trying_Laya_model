@@ -1,0 +1,100 @@
+{"text": "What is my material receipt amount?", "label": "TEXT_TO_SQL"}
+{"text": "What is a material receipt?", "label": "RAG"}
+{"text": "Show me the last 10 material receipts.", "label": "TEXT_TO_SQL"}
+{"text": "Explain the material receipt process.", "label": "RAG"}
+{"text": "What is the total purchase amount this month?", "label": "TEXT_TO_SQL"}
+{"text": "Explain the purchase order approval policy.", "label": "RAG"}
+{"text": "How many invoices are still unpaid?", "label": "TEXT_TO_SQL"}
+{"text": "What does an outstanding invoice mean?", "label": "RAG"}
+{"text": "Find customer ABC's pending balance.", "label": "TEXT_TO_SQL"}
+{"text": "How does customer credit approval work?", "label": "RAG"}
+{"text": "material receipt kitna hua is mahine", "label": "TEXT_TO_SQL"}
+{"text": "whats material receipt", "label": "RAG"}
+{"text": "What is my material receipt?", "label": "TEXT_TO_SQL"}
+{"text": "List material receipts created today.", "label": "TEXT_TO_SQL"}
+{"text": "How do I create a material receipt?", "label": "RAG"}
+{"text": "Which documents describe our refund policy?", "label": "RAG"}
+{"text": "Show customers with overdue payments.", "label": "TEXT_TO_SQL"}
+{"text": "How many invoices were created this month?", "label": "TEXT_TO_SQL"}
+{"text": "Explain the invoice approval workflow.", "label": "RAG"}
+{"text": "what's our purchase policy", "label": "RAG"}
+{"text": "how much did we sell to Reliance last quarter", "label": "TEXT_TO_SQL"}
+{"text": "Can you pull the GRNs from last week for the Bhiwandi warehouse?", "label": "TEXT_TO_SQL"}
+{"text": "What is a GRN and why do we need one?", "label": "RAG"}
+{"text": "Is PO-0453 approved?", "label": "TEXT_TO_SQL"}
+{"text": "Who needs to approve a PO above 10 lakh?", "label": "RAG"}
+{"text": "pending sales orders for Tata Motors", "label": "TEXT_TO_SQL"}
+{"text": "difference between sales order and quotation", "label": "RAG"}
+{"text": "my expense claims", "label": "TEXT_TO_SQL"}
+{"text": "How do I claim my travel expenses?", "label": "RAG"}
+{"text": "Did my expense claim from 3rd March get approved?", "label": "TEXT_TO_SQL"}
+{"text": "What expenses can be reimbursed?", "label": "RAG"}
+{"text": "How many sick leaves do I have left?", "label": "TEXT_TO_SQL"}
+{"text": "How many sick leaves are we allowed per year?", "label": "RAG"}
+{"text": "what was my salary in August", "label": "TEXT_TO_SQL"}
+{"text": "How is gratuity calculated?", "label": "RAG"}
+{"text": "Total stock value of raw materials right now", "label": "TEXT_TO_SQL"}
+{"text": "How is stock valued in our system, FIFO or moving average?", "label": "RAG"}
+{"text": "What is the valuation rate of item RM-0021?", "label": "TEXT_TO_SQL"}
+{"text": "What is valuation rate?", "label": "RAG"}
+{"text": "Why is the valuation rate of my item showing zero?", "label": "RAG"}
+{"text": "which items haven't moved in 90 days", "label": "TEXT_TO_SQL"}
+{"text": "How do I transfer stock between two warehouses?", "label": "RAG"}
+{"text": "How much stock did we transfer to Chennai warehouse in September?", "label": "TEXT_TO_SQL"}
+{"text": "What does 'To Receive and Bill' mean on a purchase order?", "label": "RAG"}
+{"text": "How many purchase orders are in To Receive and Bill?", "label": "TEXT_TO_SQL"}
+{"text": "Delivery notes pending billing", "label": "TEXT_TO_SQL"}
+{"text": "Why can't I make a sales invoice from my delivery note?", "label": "RAG"}
+{"text": "Get me the outstanding of Sharma Traders", "label": "TEXT_TO_SQL"}
+{"text": "When do we put a customer on credit hold?", "label": "RAG"}
+{"text": "Is Sharma Traders on credit hold?", "label": "TEXT_TO_SQL"}
+{"text": "What is the credit limit for new customers?", "label": "RAG"}
+{"text": "What is the credit limit of Sharma Traders?", "label": "TEXT_TO_SQL"}
+{"text": "Top 5 selling products this year", "label": "TEXT_TO_SQL"}
+{"text": "How do I set up a pricing rule for bulk discounts?", "label": "RAG"}
+{"text": "What discount did we give Apex in their last order?", "label": "TEXT_TO_SQL"}
+{"text": "What is the maximum discount a sales executive can give?", "label": "RAG"}
+{"text": "how many work orders are in progress", "label": "TEXT_TO_SQL"}
+{"text": "What is a work order used for?", "label": "RAG"}
+{"text": "What's the BOM cost for the gearbox assembly?", "label": "TEXT_TO_SQL"}
+{"text": "How do I update the cost of a BOM?", "label": "RAG"}
+{"text": "GST collected in Q2", "label": "TEXT_TO_SQL"}
+{"text": "How is GST applied on interstate sales?", "label": "RAG"}
+{"text": "TDS deducted for vendor Kumar Steels this year", "label": "TEXT_TO_SQL"}
+{"text": "What is the TDS rate for contractors?", "label": "RAG"}
+{"text": "Show me journal entries posted by Ravi yesterday", "label": "TEXT_TO_SQL"}
+{"text": "When should I use a journal entry instead of a payment entry?", "label": "RAG"}
+{"text": "How much cash do we have in the bank today?", "label": "TEXT_TO_SQL"}
+{"text": "How do I do a bank reconciliation?", "label": "RAG"}
+{"text": "Unreconciled bank transactions for September", "label": "TEXT_TO_SQL"}
+{"text": "What is the month end closing checklist?", "label": "RAG"}
+{"text": "What was our profit last month?", "label": "TEXT_TO_SQL"}
+{"text": "What is the difference between gross profit and net profit?", "label": "RAG"}
+{"text": "who are my direct reports", "label": "TEXT_TO_SQL"}
+{"text": "What is the probation period for new joinees?", "label": "RAG"}
+{"text": "How many employees joined in 2025?", "label": "TEXT_TO_SQL"}
+{"text": "What is the onboarding process for a new employee?", "label": "RAG"}
+{"text": "Was I marked absent on Monday?", "label": "TEXT_TO_SQL"}
+{"text": "How do I regularize my attendance?", "label": "RAG"}
+{"text": "status of my leave application", "label": "TEXT_TO_SQL"}
+{"text": "Can I carry forward unused leaves?", "label": "RAG"}
+{"text": "When did we last buy copper wire and at what rate?", "label": "TEXT_TO_SQL"}
+{"text": "How do we choose between suppliers for a purchase?", "label": "RAG"}
+{"text": "Which supplier has the best on-time delivery this year?", "label": "TEXT_TO_SQL"}
+{"text": "What is the penalty for late delivery by a supplier?", "label": "RAG"}
+{"text": "Open RFQs", "label": "TEXT_TO_SQL"}
+{"text": "What is an RFQ?", "label": "RAG"}
+{"text": "How many leads did we convert last month?", "label": "TEXT_TO_SQL"}
+{"text": "How do I convert a lead to a customer?", "label": "RAG"}
+{"text": "list of assets in the Pune office", "label": "TEXT_TO_SQL"}
+{"text": "How is depreciation calculated on assets?", "label": "RAG"}
+{"text": "What is my total sales for this year?", "label": "TEXT_TO_SQL"}
+{"text": "What is a sales invoice?", "label": "RAG"}
+{"text": "What is the due date of invoice ACC-SINV-2026-00412?", "label": "TEXT_TO_SQL"}
+{"text": "What is the default due date for invoices?", "label": "RAG"}
+{"text": "What is the payment status of my last purchase invoice?", "label": "TEXT_TO_SQL"}
+{"text": "What is a debit note and when is it issued?", "label": "RAG"}
+{"text": "how many debit notes did we raise against Titan Steel", "label": "TEXT_TO_SQL"}
+{"text": "I forgot my password", "label": "RAG"}
+{"text": "Who has access to the accounts module?", "label": "TEXT_TO_SQL"}
+{"text": "How do I get access to the HR module?", "label": "RAG"}

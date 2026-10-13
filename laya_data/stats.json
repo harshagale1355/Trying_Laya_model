@@ -1,0 +1,57 @@
+{
+  "train": {
+    "total": 3000,
+    "labels": {
+      "TEXT_TO_SQL": 1500,
+      "RAG": 1500
+    },
+    "templates": 43,
+    "concepts": 43
+  },
+  "val": {
+    "total": 500,
+    "labels": {
+      "RAG": 250,
+      "TEXT_TO_SQL": 250
+    },
+    "templates": 43,
+    "concepts": 40
+  },
+  "test": {
+    "total": 600,
+    "labels": {
+      "RAG": 300,
+      "TEXT_TO_SQL": 300
+    },
+    "templates": 42,
+    "concepts": 47
+  },
+  "held_out": {
+    "templates": [
+      "r_accounting",
+      "r_purpose",
+      "r_rules",
+      "r_settings",
+      "r_term_how",
+      "s_avg",
+      "s_cancelled",
+      "s_field_id",
+      "s_my_latest",
+      "s_received"
+    ],
+    "doctypes": [
+      "Debit Note",
+      "Employee Advance",
+      "Job Card",
+      "Landed Cost Voucher",
+      "Opportunity",
+      "Supplier Quotation"
+    ],
+    "terms": [
+      "TDS",
+      "budget variance",
+      "projected quantity",
+      "stock ageing"
+    ]
+  }
+}
