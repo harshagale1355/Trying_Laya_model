@@ -3,8 +3,8 @@
 Score one or more Laya checkpoints on the router eval sets.
 
 Usage:
-  python eval_router.py --models convaiinnovations/laya checkpoints/laya-erp-router-head
-  python eval_router.py --models checkpoints/laya-erp-router --data laya_data/handwritten_eval.jsonl --show-errors 30
+  python -m erp_assistant.eval_router --models convaiinnovations/laya checkpoints/laya-erp-router-head
+  python -m erp_assistant.eval_router --models checkpoints/laya-erp-router --data data/router/handwritten_eval.jsonl --show-errors 30
 
 Accepts rows in laya-train format ({state, expected}) or the short {text, label} format.
 """
@@ -15,7 +15,8 @@ from collections import Counter, defaultdict
 
 import laya
 
-from router_question import LABELS, QUESTIONS, make_state
+from .config import BASE_MODEL, ROUTER_DATA_DIR
+from .router_question import LABELS, QUESTIONS, make_state
 
 
 def load_rows(path):
@@ -77,8 +78,9 @@ def report(name, rows, preds, ms, show_errors):
 
 def main():
     ap = argparse.ArgumentParser()
-    ap.add_argument("--models", nargs="+", default=["convaiinnovations/laya"])
-    ap.add_argument("--data", nargs="+", default=["laya_data/test.jsonl", "laya_data/handwritten_eval.jsonl"])
+    ap.add_argument("--models", nargs="+", default=[BASE_MODEL])
+    ap.add_argument("--data", nargs="+", default=[str(ROUTER_DATA_DIR / "test.jsonl"),
+                                                str(ROUTER_DATA_DIR / "handwritten_eval.jsonl")])
     ap.add_argument("--batch-size", type=int, default=32)
     ap.add_argument("--show-errors", type=int, default=10)
     a = ap.parse_args()

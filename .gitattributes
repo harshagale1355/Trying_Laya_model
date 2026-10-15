@@ -1,0 +1,4 @@
+* text=auto eol=lf
+*.db binary
+*.npz binary
+*.zip binary

@@ -1,0 +1,189 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ERP Assistant</title>
+<style>
+  :root {
+    --bg: #f6f7f9; --panel: #ffffff; --text: #1d2330; --muted: #6b7280; --border: #e3e6eb;
+    --user: #2f5bd3; --user-text: #ffffff; --code: #f1f3f6;
+    --sql: #0f766e; --sql-bg: #e6f5f3; --rag: #7c3aed; --rag-bg: #f1eafe; --err: #b42318; --err-bg: #fdecea;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #12151b; --panel: #1b1f27; --text: #e6e8ec; --muted: #9aa1ad; --border: #2c323d;
+      --user: #3b6be0; --user-text: #ffffff; --code: #232833;
+      --sql: #5eead4; --sql-bg: #10302d; --rag: #c4b5fd; --rag-bg: #2a2142; --err: #fca5a5; --err-bg: #3a1c1c;
+    }
+  }
+  * { box-sizing: border-box; }
+  html, body { height: 100%; margin: 0; }
+  body {
+    background: var(--bg); color: var(--text);
+    font: 15px/1.5 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    display: flex; flex-direction: column;
+  }
+  header { padding: 14px 16px; border-bottom: 1px solid var(--border); background: var(--panel); }
+  header h1 { margin: 0; font-size: 17px; }
+  header p { margin: 2px 0 0; color: var(--muted); font-size: 13px; }
+  main { flex: 1; overflow-y: auto; padding: 16px; }
+  .wrap { max-width: 860px; margin: 0 auto; display: flex; flex-direction: column; gap: 14px; }
+  .msg { max-width: 100%; padding: 10px 14px; border-radius: 12px; white-space: pre-wrap; overflow-wrap: anywhere; }
+  .user { align-self: flex-end; max-width: 80%; background: var(--user); color: var(--user-text); }
+  .bot { align-self: stretch; background: var(--panel); border: 1px solid var(--border); }
+  .bot.error { background: var(--err-bg); color: var(--err); border-color: transparent; }
+  .bot.thinking { color: var(--muted); font-style: italic; }
+  .badge { display: inline-block; font-size: 12px; font-weight: 600; padding: 1px 8px; border-radius: 999px; margin-bottom: 6px; }
+  .badge.sql { color: var(--sql); background: var(--sql-bg); }
+  .badge.rag { color: var(--rag); background: var(--rag-bg); }
+  details { margin-top: 10px; border-top: 1px solid var(--border); padding-top: 8px; white-space: normal; }
+  summary { cursor: pointer; color: var(--muted); font-size: 13px; }
+  pre { background: var(--code); padding: 10px; border-radius: 8px; overflow-x: auto; font-size: 13px; margin: 8px 0; white-space: pre-wrap; }
+  .table-box { max-height: 320px; overflow: auto; border: 1px solid var(--border); border-radius: 8px; }
+  table { border-collapse: collapse; width: 100%; font-size: 13px; }
+  th, td { padding: 5px 10px; border-bottom: 1px solid var(--border); text-align: left; white-space: nowrap; }
+  th { position: sticky; top: 0; background: var(--code); }
+  .note { color: var(--muted); font-size: 12px; margin-top: 4px; }
+  .chips { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; }
+  .chip {
+    border: 1px solid var(--border); background: var(--panel); color: var(--text);
+    border-radius: 999px; padding: 6px 12px; font: inherit; font-size: 13px; cursor: pointer;
+  }
+  .chip:hover { border-color: var(--user); }
+  .empty { text-align: center; color: var(--muted); margin-top: 8vh; }
+  form { display: flex; gap: 8px; padding: 12px 16px; border-top: 1px solid var(--border); background: var(--panel); }
+  form .inner { max-width: 860px; margin: 0 auto; display: flex; gap: 8px; width: 100%; }
+  input {
+    flex: 1; min-width: 0; padding: 10px 12px; border-radius: 10px; border: 1px solid var(--border);
+    background: var(--bg); color: var(--text); font: inherit;
+  }
+  button[type=submit] {
+    padding: 10px 18px; border: 0; border-radius: 10px; background: var(--user); color: var(--user-text);
+    font: inherit; font-weight: 600; cursor: pointer;
+  }
+  button:disabled, input:disabled { opacity: .6; cursor: default; }
+</style>
+</head>
+<body>
+<header>
+  <h1>ERP Assistant</h1>
+  <p>Laya routes each question to Text-to-SQL or company-docs RAG; Gemini answers.</p>
+</header>
+<main id="scroll">
+  <div class="wrap" id="log">
+    <div class="empty" id="empty">
+      <p>Ask about orders, invoices, stock, employees, or company policies.</p>
+      <div class="chips">
+        <button class="chip" type="button">How many invoices are overdue?</button>
+        <button class="chip" type="button">Which 5 customers have the highest total sales?</button>
+        <button class="chip" type="button">What is the leave carry-forward policy?</button>
+        <button class="chip" type="button">What is the process for onboarding a new vendor?</button>
+      </div>
+    </div>
+  </div>
+</main>
+<form id="form">
+  <div class="inner">
+    <input id="q" autocomplete="off" placeholder="Ask a question..." maxlength="1000" autofocus>
+    <button type="submit" id="send">Send</button>
+  </div>
+</form>
+<script>
+  const log = document.getElementById("log");
+  const scroll = document.getElementById("scroll");
+  const form = document.getElementById("form");
+  const input = document.getElementById("q");
+  const send = document.getElementById("send");
+
+  function el(tag, cls, text) {
+    const node = document.createElement(tag);
+    if (cls) node.className = cls;
+    if (text !== undefined) node.textContent = text;
+    return node;
+  }
+
+  function add(node) {
+    const empty = document.getElementById("empty");
+    if (empty) empty.remove();
+    log.appendChild(node);
+    scroll.scrollTop = scroll.scrollHeight;
+    return node;
+  }
+
+  // Gemini answers use **bold**; render it via text nodes only, never innerHTML.
+  function richText(text) {
+    const div = el("div");
+    String(text).split(/\*\*(.+?)\*\*/s).forEach((part, i) => {
+      div.appendChild(i % 2 ? el("strong", null, part) : document.createTextNode(part));
+    });
+    return div;
+  }
+
+  function resultTable(columns, rows) {
+    const box = el("div", "table-box");
+    const table = el("table");
+    const head = el("tr");
+    columns.forEach(c => head.appendChild(el("th", null, c)));
+    table.appendChild(el("thead")).appendChild(head);
+    const body = table.appendChild(el("tbody"));
+    rows.forEach(r => {
+      const tr = el("tr");
+      r.forEach(v => tr.appendChild(el("td", null, v === null ? "" : String(v))));
+      body.appendChild(tr);
+    });
+    box.appendChild(table);
+    return box;
+  }
+
+  function render(node, data) {
+    node.className = "msg bot";
+    node.textContent = "";
+    const isSql = data.route === "TEXT_TO_SQL";
+    const pct = Math.round((data.confidence || 0) * 100);
+    node.appendChild(el("span", "badge " + (isSql ? "sql" : "rag"), `${data.route} · ${pct}%`));
+    node.appendChild(richText(data.answer));
+    if (isSql) {
+      const det = el("details");
+      det.appendChild(el("summary", null, `SQL and result (${data.rows.length} row${data.rows.length === 1 ? "" : "s"})`));
+      det.appendChild(el("pre", null, data.sql));
+      if (data.columns.length && data.rows.length) det.appendChild(resultTable(data.columns, data.rows));
+      else det.appendChild(el("div", "note", "No rows returned."));
+      node.appendChild(det);
+    }
+  }
+
+  async function ask(question) {
+    add(el("div", "msg user", question));
+    const pending = add(el("div", "msg bot thinking", "Thinking..."));
+    input.disabled = send.disabled = true;
+    try {
+      const resp = await fetch("/api/ask", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ question }),
+      });
+      const data = await resp.json().catch(() => ({ error: `HTTP ${resp.status}` }));
+      if (!resp.ok || data.error) throw new Error(data.error || `HTTP ${resp.status}`);
+      render(pending, data);
+    } catch (err) {
+      pending.className = "msg bot error";
+      pending.textContent = "Could not answer: " + err.message;
+    } finally {
+      input.disabled = send.disabled = false;
+      input.focus();
+      scroll.scrollTop = scroll.scrollHeight;
+    }
+  }
+
+  form.addEventListener("submit", e => {
+    e.preventDefault();
+    const q = input.value.trim();
+    if (!q || send.disabled) return;
+    input.value = "";
+    ask(q);
+  });
+  document.querySelectorAll(".chip").forEach(c => c.addEventListener("click", () => { if (!send.disabled) ask(c.textContent); }));
+</script>
+</body>
+</html>

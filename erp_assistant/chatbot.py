@@ -3,9 +3,8 @@
 Hybrid ERP chatbot: the fine-tuned Laya router sends each question to Text-to-SQL or RAG,
 and Gemini answers it.
 
-  pip install google-genai
-  set GEMINI_API_KEY=...          (PowerShell: $env:GEMINI_API_KEY="...")
-  python chatbot.py
+  GEMINI_API_KEY in .env or the environment
+  python -m erp_assistant.chatbot
 
 Commands: /sql <question> and /rag <question> force a branch; exit or quit leaves.
 """
@@ -14,18 +13,20 @@ import os
 import re
 import sqlite3
 import sys
-from pathlib import Path
 
 import numpy as np
 
-ROOT = Path(__file__).resolve().parent
-DB_PATH = ROOT / "erp_dataset" / "erp.db"
-SCHEMA_PATH = ROOT / "erp_dataset" / "schema.sql"
-DOCS_DIR = ROOT / "erp_dataset" / "docs"
-INDEX_PATH = ROOT / "erp_dataset" / "rag_index.npz"
+from .config import BASE_MODEL, CHECKPOINTS_DIR, ERP_DIR, load_env
 
-DB_TODAY = "2026-10-11"  # TODAY in generate_erp_dataset.py; statuses in erp.db are relative to it
-GEMINI_MODEL = os.environ.get("GEMINI_MODEL", "gemini-2.5-flash")
+load_env()
+
+DB_PATH = ERP_DIR / "erp.db"
+SCHEMA_PATH = ERP_DIR / "schema.sql"
+DOCS_DIR = ERP_DIR / "docs"
+INDEX_PATH = ERP_DIR / "rag_index.npz"
+
+DB_TODAY = "2026-10-11"  # TODAY in generate_erp_data.py; statuses in erp.db are relative to it
+GEMINI_MODEL = os.environ.get("GEMINI_MODEL", "gemini-3.8-flash")
 EMBED_MODEL = "gemini-embedding-001"
 MAX_ROWS = 50
 TOP_K = 4
@@ -36,12 +37,12 @@ TOP_K = 4
 def load_router():
     import laya
 
-    from router_question import QUESTIONS, make_state
+    from .router_question import QUESTIONS, make_state
 
-    model = next((p for p in ("checkpoints/laya-erp-router", "checkpoints/laya-erp-router-head")
-                  if (ROOT / p).is_dir()), "convaiinnovations/laya")
+    model = next((str(p) for p in (CHECKPOINTS_DIR / "laya-erp-router", CHECKPOINTS_DIR / "laya-erp-router-head")
+                  if p.is_dir()), BASE_MODEL)
     print(f"Loading Laya router from {model} ...")
-    agent = laya.load(str(ROOT / model) if model.startswith("checkpoints") else model)
+    agent = laya.load(model)
 
     def route(question):
         answer = agent.predict(make_state(question), QUESTIONS)["answers"]["route"]
@@ -135,10 +136,9 @@ def answer_sql(client, schema, question):
         sql = check_sql(generate(client, retry, SQL_SYSTEM, as_json=True)["sql"])
         cols, rows = run_sql(sql)
 
-    print(f"\nSQL:\n  {sql}\n")
-    print(format_table(cols, rows))
     result = json.dumps({"columns": cols, "rows": rows[:MAX_ROWS]}, default=str)
-    return generate(client, f"Question: {question}\nSQL: {sql}\nResult: {result}", ANSWER_SYSTEM)
+    answer = generate(client, f"Question: {question}\nSQL: {sql}\nResult: {result}", ANSWER_SYSTEM)
+    return {"answer": answer, "sql": sql, "columns": cols, "rows": rows}
 
 
 # ---------------------------------------------------------------- RAG
@@ -165,7 +165,7 @@ def load_index(client):
         data = np.load(INDEX_PATH, allow_pickle=False)
         if str(data["signature"]) == signature:
             return json.loads(str(data["chunks"])), data["vectors"]
-    print("Building RAG index from erp_dataset/docs ...")
+    print("Building RAG index from data/erp/docs ...")
     chunks = chunk_docs()
     vectors = embed(client, [c["text"] for c in chunks], "RETRIEVAL_DOCUMENT")
     np.savez(INDEX_PATH, signature=signature, chunks=json.dumps(chunks), vectors=vectors)
@@ -179,8 +179,17 @@ def answer_rag(client, index, question):
     top = [chunks[i] for i in np.argsort(-scores)[:TOP_K]]
     context = "\n\n".join(f"[{c['doc']}]\n{c['text']}" for c in top)
     sources = list(dict.fromkeys(c["doc"] for c in top))
-    print(f"\nRetrieved from: {', '.join(sources)}")
-    return generate(client, f"Documents:\n{context}\n\nQuestion: {question}", RAG_SYSTEM)
+    answer = generate(client, f"Documents:\n{context}\n\nQuestion: {question}", RAG_SYSTEM)
+    return {"answer": answer, "sources": sources}
+
+
+def answer(client, schema, index, choice, question):
+    return answer_sql(client, schema, question) if choice == "TEXT_TO_SQL" else answer_rag(client, index, question)
+
+
+def ask(client, route, schema, index, question):
+    choice, conf = route(question)
+    return {"route": choice, "confidence": conf, **answer(client, schema, index, choice, question)}
 
 
 # ---------------------------------------------------------------- chat loop
@@ -219,8 +228,13 @@ def main():
             print("Route: %s (confidence %.2f)" % (choice, conf))
 
         try:
-            answer = answer_sql(client, schema, question) if choice == "TEXT_TO_SQL" else answer_rag(client, index, question)
-            print(f"\nAssistant: {answer}\n" + "-" * 60)
+            result = answer(client, schema, index, choice, question)
+            if "sql" in result:
+                print(f"\nSQL:\n  {result['sql']}\n")
+                print(format_table(result["columns"], result["rows"]))
+            else:
+                print(f"\nRetrieved from: {', '.join(result['sources'])}")
+            print(f"\nAssistant: {result['answer']}\n" + "-" * 60)
         except Exception as err:
             print(f"\nCould not answer: {err}\n" + "-" * 60)
 

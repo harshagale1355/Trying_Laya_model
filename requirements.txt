@@ -1,0 +1,5 @@
+# Router (pulls in torch + transformers)
+laya==0.4.2
+numpy>=1.26
+# Gemini for SQL generation, RAG embeddings and answers
+google-genai>=1.0

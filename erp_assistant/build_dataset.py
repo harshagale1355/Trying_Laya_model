@@ -12,7 +12,7 @@ Outputs (in --out directory), rows in laya-train's {state, questions, expected} 
   test.jsonl    held-out templates OR held-out doctypes/terms -> measures generalisation
   stats.json
 
-Usage:  python build_laya_dataset.py --out laya_data --seed 42
+Usage:  python -m erp_assistant.build_dataset --seed 42      # writes data/router/
 """
 import argparse
 import json
@@ -20,7 +20,8 @@ import os
 import random
 from collections import Counter
 
-from router_question import QUESTIONS, make_state
+from .config import ROUTER_DATA_DIR
+from .router_question import QUESTIONS, make_state
 
 SQL, RAG = "TEXT_TO_SQL", "RAG"
 
@@ -341,7 +342,7 @@ def to_laya(r, rid):
 
 def main():
     ap = argparse.ArgumentParser()
-    ap.add_argument("--out", default="laya_data")
+    ap.add_argument("--out", default=str(ROUTER_DATA_DIR))
     ap.add_argument("--seed", type=int, default=42)
     ap.add_argument("--train-size", type=int, default=3000)
     ap.add_argument("--val-size", type=int, default=500)

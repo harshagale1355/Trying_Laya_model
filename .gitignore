@@ -8,22 +8,21 @@ venv/
 # Secrets (GEMINI_API_KEY etc.)
 .env
 .env.*
+!.env.example
 
-# Trained Laya checkpoints (~1.6 GB) and their downloaded archives
+# Trained Laya checkpoints (~1.6 GB), their downloaded archives, and colab_upload.zip
 checkpoints/
 *.zip
 
-# Regenerated automatically by chatbot.py when the docs change
-erp_dataset/rag_index.npz
-
-# Old 4-label router data that generate_erp_dataset.py still writes
-erp_dataset/router_*.jsonl
+# Regenerated automatically by the chatbot when the docs change
+data/erp/rag_index.npz
 
 # Editors / OS
 .vscode/
 .idea/
 .DS_Store
 Thumbs.db
+
+# Local Claude Code notes
 CLAUDE.md
 .CLAUDE.md
-./CLAUDE.md

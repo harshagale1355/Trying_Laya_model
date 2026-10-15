@@ -1,0 +1,18 @@
+{
+  "tables": {
+    "departments": 7,
+    "employees": 63,
+    "leave_requests": 160,
+    "customers": 80,
+    "vendors": 25,
+    "products": 48,
+    "warehouses": 3,
+    "inventory": 144,
+    "sales_orders": 2000,
+    "sales_order_items": 6001,
+    "purchase_orders": 600,
+    "purchase_order_items": 1530,
+    "invoices": 1762,
+    "payments": 1560
+  }
+}
